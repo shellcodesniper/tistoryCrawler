@@ -58,7 +58,7 @@ def findSubject(soup):
 
 def OptiMizer(arr):
 	darr = []
-	deleteArray = ['티스토리툴바', '툴바', 'toolbar', 'related', 'articles','태그','최근글','댓글','공지사항']
+	deleteArray = ['티스토리툴바', '툴바', 'toolbar', 'related', 'articles','태그','최근글','댓글','공지사항','관련글','더보기']
 	for row in arr:
 		deleteSwitch = False
 		for deleteTarget in deleteArray:
