@@ -77,74 +77,81 @@ def OptiMizer(arr):
 		
 
 def main():
-	url = ''
-	url = input("URL을 입력해주세요.\n")
-	if(url.count('http') != 0):
-		url = "https://{}".format(url)
-	
-	if(url[-1] == '/'):
-		url = url[:-1]
+	urlList = []
 
-	EM = EXCEL_MAKER(url)
-	
-	session = prepare_session()
-	
-	r = session.get(url)
+	open('lists.txt', 'a').close()
+	with open ('lists.txt', 'rt') as F:
+		for link in F.readlines():
+			if(link.strip() != ''):
+				url = link
+				if(url.count('http') == 0):
+					url = "https://{}".format(url)
+				if(url[-1] == '/'):
+					url = url[:-1]
+				url = url.strip()
+				urlList.append(url)
 
-	soup = BeautifulSoup(r.text, 'html.parser')
-
-	topindex = 0
-	last_crawled = 0
-
-	open('history.txt', 'a').close()
-
-	with open('history.txt', 'r') as F:
-		for row in F.readlines():
-			try:
-				tUrl = row.split('||')[0].strip()
-				tLast = int(row.split('||')[1].strip())
-
-				if(tUrl.count(url) != 0):
-					# print(tUrl,tLast)
-					last_crawled = tLast
-					break
-			except:
-				pass
+	for url in urlList:
+		EM = EXCEL_MAKER(url)
 		
-
-
-
-	for link in soup.find_all('a'):
-		link = link.get('href')
-		if(link == None):
-			continue
+		session = prepare_session()
 		
-		replacedText = link.split('?', 1)[0].replace('/', '').strip()
-		if(replacedText.isdecimal()):
-			if(topindex < int(replacedText)):
-				topindex = int(replacedText)
+		r = session.get(url)
 
-	# print(topindex,last_crawled)
-	if(topindex == 0):
-		print ("이 사이트는 /10 같은 url 형식이 아닌, 제목을 이용한 형식으로 크롤링이 불가능합니다.")
-	
-	for index in range(topindex, last_crawled, -1):
-		print ("\t# 진행상황 : {} 부터 {} 까지 {}%.".format(1,topindex, int((1 - index/topindex)*100)))
-		currentUrl = "{}/{}".format(url, index)
-
-		r = session.get(currentUrl)
 		soup = BeautifulSoup(r.text, 'html.parser')
 
-		predictedTarget = findSubject(soup)
-		predictedTarget = OptiMizer(predictedTarget)
+		topindex = 0
+		last_crawled = 0
 
-		if(len(predictedTarget) > 0):
-			print("{} : {}".format(topindex-index, predictedTarget[0]))
-			EM.Append(currentUrl, predictedTarget[0])
+		open('history.txt', 'a').close()
 
-	EM.Finish(url, topindex, last_crawled)
-	print("##    완료 혹은 새로운 게시물이 없습니다.    ##")
-	
+		with open('history.txt', 'r') as F:
+			for row in F.readlines():
+				try:
+					tUrl = row.split('||')[0].strip()
+					tLast = int(row.split('||')[1].strip())
+
+					if(tUrl.count(url) != 0):
+						# print(tUrl,tLast)
+						last_crawled = tLast
+						break
+				except:
+					pass
+			
+
+
+
+		for link in soup.find_all('a'):
+			link = link.get('href')
+			if(link == None):
+				continue
+			
+			replacedText = link.split('?', 1)[0].replace('/', '').strip()
+			if(replacedText.isdecimal()):
+				if(topindex < int(replacedText)):
+					topindex = int(replacedText)
+
+		# print(topindex,last_crawled)
+		if(topindex == 0):
+			print ("이 사이트는 /10 같은 url 형식이 아닌, 제목을 이용한 형식으로 크롤링이 불가능합니다.")
+		
+		for index in range(topindex, last_crawled, -1):
+			print ("\t# 진행상황 : {} 부터 {} 까지 {}%.".format(1,topindex, int((1 - index/topindex)*100)))
+			currentUrl = "{}/{}".format(url, index)
+
+			r = session.get(currentUrl)
+			soup = BeautifulSoup(r.text, 'html.parser')
+
+			predictedTarget = findSubject(soup)
+			predictedTarget = OptiMizer(predictedTarget)
+
+			if(len(predictedTarget) > 0):
+				print("{} : {}".format(topindex-index, predictedTarget[0]))
+				EM.Append(currentUrl, predictedTarget[0])
+
+		EM.Finish(url, topindex, last_crawled)
+		print("##    완료 혹은 새로운 게시물이 없습니다.    ##")
+		
 
 class EXCEL_MAKER(object):
 	
@@ -188,7 +195,7 @@ class EXCEL_MAKER(object):
 					continue
 				F.writelines(row.strip()+'\n')
 		if(topIndex != last_crawled):
-			self.wb.save('사이트분석파일.xlsx')
+			self.wb.save('사이트분석파일_({}).xlsx'.format(url.split('://')[1].replace('.','_').replace('/','').strip()))
 
 if __name__ == "__main__":
 	main()
