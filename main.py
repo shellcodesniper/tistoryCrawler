@@ -14,10 +14,9 @@ def findSubject(soup):
 
 	# for item in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5']):
 	predictedSoupList = []
-	if(len(soup.select('div[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('div[class*="title"]'))
-	if(len(soup.select('h3[class*="tit"]')) != 0):
-		predictedSoupList.append(soup.select('h3[class*="tit"]'))
+	
+	if(len(soup.select('h3[class*="tit_"]')) != 0):
+		predictedSoupList.append(soup.select('h3[class*="tit_"]'))
 	if(len(soup.select('strong[class*="title"]')) != 0):
 		predictedSoupList.append(soup.select('strong[class*="title"]'))
 	if(len(soup.select('h1[class*="title"]')) != 0):
@@ -26,6 +25,23 @@ def findSubject(soup):
 		predictedSoupList.append(soup.select('h2[class*="title"]'))
 	if(len(soup.select('h3[class*="title"]')) != 0):
 		predictedSoupList.append(soup.select('h3[class*="title"]'))
+
+	if(len(soup.select('p[class*="txt_sub_tit"]')) != 0):
+		predictedSoupList.append(soup.select('h3[class*="txt_sub_title"]'))
+	if(len(soup.select('strong[class*="title"]')) != 0):
+		predictedSoupList.append(soup.select('strong[class*="title"]'))
+	# if(len(soup.select('h3[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('h3[class*="title"]'))
+	# if(len(soup.select('h3[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('h3[class*="title"]'))
+	# if(len(soup.select('h3[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('h3[class*="title"]'))
+	# if(len(soup.select('h3[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('h3[class*="title"]'))
+
+	if(len(soup.select('div[class*="title"]')) != 0):
+		predictedSoupList.append(soup.select('div[class*="title"]'))
+	
 	if(len(soup.find_all(['h1', 'h2', 'h3', 'h4'])) != 0):
 		predictedSoupList.append(soup.find_all(['h1', 'h2', 'h3', 'h4']))
 
@@ -63,6 +79,9 @@ def OptiMizer(arr):
 def main():
 	url = ''
 	url = input("URL을 입력해주세요.\n")
+	if(url.count('http') != 0):
+		url = "https://{}".format(url)
+	
 	if(url[-1] == '/'):
 		url = url[:-1]
 
