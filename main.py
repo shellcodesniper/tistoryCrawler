@@ -15,21 +15,59 @@ def findSubject(soup):
 	# for item in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5']):
 	predictedSoupList = []
 	
-	if(len(soup.select('h3[class*="tit_"]')) != 0):
-		predictedSoupList.append(soup.select('h3[class*="tit_"]'))
-	if(len(soup.select('strong[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('strong[class*="title"]'))
-	if(len(soup.select('h1[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('h1[class*="title"]'))
-	if(len(soup.select('h2[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('h2[class*="title"]'))
-	if(len(soup.select('h3[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('h3[class*="title"]'))
 
-	if(len(soup.select('p[class*="txt_sub_tit"]')) != 0):
-		predictedSoupList.append(soup.select('h3[class*="txt_sub_title"]'))
-	if(len(soup.select('strong[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('strong[class*="title"]'))
+	# if(len(soup.select('strong[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('strong[class*="title"]'))
+	# if(len(soup.select('h1[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('h1[class*="title"]'))
+	
+	selector = '[class*="title_view"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+	
+	selector = '[class*="tit_post"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="hd-heading"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="gh-text"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="headline"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="jb-content-title"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="titleWrap"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="post-title"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="title"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	selector = '[class*="article-header"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+
+	# selector = '[class*="tit_post"]'
+	# if(len(soup.select(selector)) != 0):
+	# 	predictedSoupList.append(soup.select(selector))
+
+	# selector = '[class*="tit_post"]'
+	# if(len(soup.select(selector)) != 0):
+	# 	predictedSoupList.append(soup.select(selector))
 	# if(len(soup.select('h3[class*="title"]')) != 0):
 	# 	predictedSoupList.append(soup.select('h3[class*="title"]'))
 	# if(len(soup.select('h3[class*="title"]')) != 0):
@@ -39,8 +77,8 @@ def findSubject(soup):
 	# if(len(soup.select('h3[class*="title"]')) != 0):
 	# 	predictedSoupList.append(soup.select('h3[class*="title"]'))
 
-	if(len(soup.select('div[class*="title"]')) != 0):
-		predictedSoupList.append(soup.select('div[class*="title"]'))
+	# if(len(soup.select('div[class*="title"]')) != 0):
+	# 	predictedSoupList.append(soup.select('div[class*="title"]'))
 	
 	if(len(soup.find_all(['h1', 'h2', 'h3', 'h4'])) != 0):
 		predictedSoupList.append(soup.find_all(['h1', 'h2', 'h3', 'h4']))
@@ -58,7 +96,7 @@ def findSubject(soup):
 
 def OptiMizer(arr):
 	darr = []
-	deleteArray = ['티스토리툴바', '툴바', 'toolbar', 'related', 'articles','태그','최근글','댓글','공지사항','관련글','더보기']
+	deleteArray = ['티스토리툴바', '툴바', 'toolbar', 'related', 'articles','태그','최근글','댓글','공지사항','관련글','더보기','포스트']
 	for row in arr:
 		deleteSwitch = False
 		for deleteTarget in deleteArray:
@@ -78,6 +116,7 @@ def OptiMizer(arr):
 
 def main():
 	urlList = []
+	EM = EXCEL_MAKER()
 
 	open('lists.txt', 'a').close()
 	with open ('lists.txt', 'rt') as F:
@@ -92,7 +131,7 @@ def main():
 				urlList.append(url)
 
 	for url in urlList:
-		EM = EXCEL_MAKER(url)
+		EM.NewSite(url)
 		
 		session = prepare_session()
 		
@@ -151,21 +190,26 @@ def main():
 
 		EM.Finish(url, topindex, last_crawled)
 		print("##    완료 혹은 새로운 게시물이 없습니다.    ##")
+	
+	EM.Save()
 		
 
 class EXCEL_MAKER(object):
 	
-	def __init__(self, siteName):
+	def __init__(self):
 		self.wb = Workbook()
 		self.sheet = self.wb.active
 		self.sheet.title = u'분석결과'
-		self.sheet.append(['인덱스', '주소', '제목', '', '사이트기준주소', siteName])
+
 		self.sheet.column_dimensions['A'].width = 25
 		self.sheet.column_dimensions['B'].width = 50
 		self.sheet.column_dimensions['C'].width = 50
 		self.sheet.column_dimensions['E'].width = 20
 		self.sheet.column_dimensions['F'].width = 20
 		self.index = 0
+
+	def NewSite(self, siteName):
+		self.sheet.append(['인덱스', '주소', '제목', '', '사이트기준주소', siteName])
 
 	def Append(self, url, subject):
 		self.index += 1
@@ -175,6 +219,8 @@ class EXCEL_MAKER(object):
 		writeList = []
 		processed = False
 
+		self.sheet.append([])
+		self.sheet.append([])
 		with open('history.txt', 'rt') as F:
 			for row in F.readlines():
 				try:
@@ -194,8 +240,9 @@ class EXCEL_MAKER(object):
 				if(row.strip() == ''):
 					continue
 				F.writelines(row.strip()+'\n')
-		if(topIndex != last_crawled):
-			self.wb.save('사이트분석파일_({}).xlsx'.format(url.split('://')[1].replace('.','_').replace('/','').strip()))
+
+	def Save(self):
+		self.wb.save('사이트분석파일.xlsx')
 
 if __name__ == "__main__":
 	main()

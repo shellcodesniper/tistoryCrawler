@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+lists.txt
+history.txt
+사이트분석파일.xlsx
+
 # C extensions
 *.so
 
