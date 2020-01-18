@@ -14,6 +14,10 @@ def findSubject(soup):
 
 	# for item in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5']):
 	predictedSoupList = []
+	if(len(soup.select('div[class*="title"]')) != 0):
+		predictedSoupList.append(soup.select('div[class*="title"]'))
+	if(len(soup.select('h3[class*="tit"]')) != 0):
+		predictedSoupList.append(soup.select('h3[class*="tit"]'))
 	if(len(soup.select('strong[class*="title"]')) != 0):
 		predictedSoupList.append(soup.select('strong[class*="title"]'))
 	if(len(soup.select('h1[class*="title"]')) != 0):
