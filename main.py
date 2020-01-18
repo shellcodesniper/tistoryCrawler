@@ -57,7 +57,8 @@ def OptiMizer(arr):
 		
 
 def main():
-	url = 'https://blog.siyeol.com/'
+	url = ''
+	url = input("URL을 입력해주세요.\n")
 	if(url[-1] == '/'):
 		url = url[:-1]
 
@@ -81,6 +82,7 @@ def main():
 				tLast = int(row.split('||')[1].strip())
 
 				if(tUrl.count(url) != 0):
+					# print(tUrl,tLast)
 					last_crawled = tLast
 					break
 			except:
@@ -98,6 +100,10 @@ def main():
 		if(replacedText.isdecimal()):
 			if(topindex < int(replacedText)):
 				topindex = int(replacedText)
+
+	# print(topindex,last_crawled)
+	if(topindex == 0):
+		print ("이 사이트는 /10 같은 url 형식이 아닌, 제목을 이용한 형식으로 크롤링이 불가능합니다.")
 	
 	for index in range(topindex, last_crawled, -1):
 		print ("\t# 진행상황 : {} 부터 {} 까지 {}%.".format(1,topindex, int((1 - index/topindex)*100)))
@@ -113,7 +119,8 @@ def main():
 			print("{} : {}".format(topindex-index, predictedTarget[0]))
 			EM.Append(currentUrl, predictedTarget[0])
 
-	EM.Finish(url,topindex)
+	EM.Finish(url, topindex, last_crawled)
+	print("##    완료 혹은 새로운 게시물이 없습니다.    ##")
 	
 
 class EXCEL_MAKER(object):
@@ -134,7 +141,7 @@ class EXCEL_MAKER(object):
 		self.index += 1
 		self.sheet.append([self.index, '=HYPERLINK("{}", "{}")'.format(url,url), subject])
 
-	def Finish(self,url,topIndex):
+	def Finish(self, url, topIndex, last_crawled):
 		writeList = []
 		processed = False
 
@@ -154,8 +161,11 @@ class EXCEL_MAKER(object):
 
 		with open('history.txt', 'wt') as F:
 			for row in writeList:
-				F.writelines(row)
-		self.wb.save('사이트분석파일.xlsx')
+				if(row.strip() == ''):
+					continue
+				F.writelines(row.strip()+'\n')
+		if(topIndex != last_crawled):
+			self.wb.save('사이트분석파일.xlsx')
 
 if __name__ == "__main__":
 	main()
