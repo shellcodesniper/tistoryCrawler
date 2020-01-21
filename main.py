@@ -21,6 +21,10 @@ def findSubject(soup):
 	# if(len(soup.select('h1[class*="title"]')) != 0):
 	# 	predictedSoupList.append(soup.select('h1[class*="title"]'))
 	
+	selector = '[class*="txt_sub_tit"]'
+	if(len(soup.select(selector)) != 0):
+		predictedSoupList.append(soup.select(selector))
+	
 	selector = '[class*="title_view"]'
 	if(len(soup.select(selector)) != 0):
 		predictedSoupList.append(soup.select(selector))
